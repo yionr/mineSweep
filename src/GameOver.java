@@ -11,18 +11,16 @@ import javax.swing.*;
 
 
 public class GameOver extends JFrame{
-	static String time;
-	static int rank;
-	static JFrame jj;
-	static String str;
+	private static String time;
+	private static int rank;
+	private static String str;
 	private JButton jbtAgain = new JButton("Again");
 	private JButton jbtCanel = new JButton("Cancel");
 
-	public GameOver( String time,int rank,JFrame jj,String str){
-		this.str = str;
-		this.jj = jj;
-		this.time=time;
-		this.rank = rank;
+	public GameOver( String time,int rank,JFrame window,String str){
+		GameOver.str = str;
+		GameOver.time =time;
+		GameOver.rank = rank;
 		this.setTitle("结算");
 		this.setSize(250,150);
 		this.setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -35,25 +33,16 @@ public class GameOver extends JFrame{
 		this.add(setResultPanel() ,BorderLayout.CENTER);
 		this.add(setContinuePanel() ,BorderLayout.SOUTH);
 		
-		jbtCanel.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				System.exit(0);
+		jbtCanel.addActionListener(e -> System.exit(0));
+		jbtAgain.addActionListener(e -> {
+			try {
+				GameOver.super.setVisible(false);
+				Window.class.getDeclaredMethod("res").invoke(window);
+			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
+				e1.printStackTrace();
 			}
-		});
-		jbtAgain.addActionListener(new ActionListener() {
-			@Override
-			public void actionPerformed(ActionEvent e) {
-				try {
-					GameOver.super.setVisible(false);
-					Window.class.getDeclaredMethod("res").invoke(jj);
-				} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
-					e1.printStackTrace();
-				}
-				jj.setEnabled(true);
-            }
-		});
+			window.setEnabled(true);
+});
 		
 	}
 	
@@ -84,7 +73,7 @@ public class GameOver extends JFrame{
         r.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Connection ct = DBUtil.getConnection(DBUtil.DBIP,DBUtil.NAME,DBUtil.PASSWORD);
+                Connection ct = DBUtil.getConnection();
 				String sum = "";
 				try {
 					Statement s = ct.createStatement();

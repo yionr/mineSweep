@@ -227,7 +227,7 @@ public class Window extends JFrame {
         showAllMines();
         long usedTime = new Date().getTime() - time;        //所用时间
         //排名算法.:    雷的数量和 所用时间的一波计算得出来:
-        Connection ct = DBUtil.getConnection(DBUtil.DBIP,DBUtil.NAME,DBUtil.PASSWORD);
+        Connection ct = DBUtil.getConnection();
         Statement s = ct.createStatement();
         String sql_init  ="use " + DBUtil.DATABASE;
         String sql = "insert into mine values (" + usedTime + "," + mine + "," + usedTime/mine + ")";

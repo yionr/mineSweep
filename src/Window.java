@@ -1,45 +1,45 @@
 import javax.swing.*;
-        import java.awt.*;
-        import java.awt.event.ActionEvent;
-        import java.awt.event.ActionListener;
-        import java.awt.event.MouseAdapter;
-        import java.awt.event.MouseEvent;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.sql.*;
 import java.util.ArrayList;
-        import java.util.Date;
+import java.util.Date;
 
 
         //前提:mysql启动,存在mine数据库,存在mine(time int,mine int ,rank int)数据表
 public class Window extends JFrame {
-    public static final int px = 50;        //42以下,好像就不能正常的显示数字了
-    public static int row;
-    public static int col;
-    public static int heigh;
-    public static int width;
-    public static int difficuty;
-    public static boolean[][] clicked;
-    public static boolean[][] rightClicked;
-    public static int[][] arr;
-    public static long time;
-    public static int mistory;
-    public static int mine;
-    public static int pointed;
+    private static final int px = 50;        //42以下,好像就不能正常的显示数字了
+    private static int row;
+    private static int col;
+    private static int heigh;
+    private static int width;
+    private static int difficuty;
+    private static boolean[][] clicked;
+    private static boolean[][] rightClicked;
+    private static int[][] arr;
+    private static long time;
+    private static int mistory;
+    private static int mine;
+    private static int pointed;
     public static final String NAME = "root";
     public static final String PASSWORD = "1999102lp";
     public static final String DATABASE = "mine";
     public static final String DBIP = "localhost";
 
-    public static ArrayList c;
+    private static ArrayList c;
     public static void main(String[] args) {
         new Window();
     }
-    public Window(){
+    private Window(){
         init();
         this.setSize(width,heigh);
         this.setTitle("MineSweeping");
         this.setLayout(new BorderLayout());
         this.setResizable(false);
-//        this.add(MenuArea(),BorderLayout.NORTH);
+        this.add(MenuArea(),BorderLayout.NORTH);
         this.add(gameArea(row,col));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
@@ -156,8 +156,8 @@ public class Window extends JFrame {
                         y = c.indexOf(btn)%col;
                         if (e.getButton() == 3){
                             JButton jbtemp = (JButton)e.getSource();
-                            if (jbtemp.isEnabled() ||rightClicked[x][y] == true)
-                                if (jbtemp.getText() != "!" && jbtemp.getText() !="?"){
+                            if (jbtemp.isEnabled() || rightClicked[x][y])
+                                if (jbtemp.getText().equals("!") && jbtemp.getText().equals("?")){
                                     jbtemp.setText("!");
                                     jbtemp.setEnabled(false);
                                     jbtemp.setBackground(Color.yellow);
@@ -165,7 +165,7 @@ public class Window extends JFrame {
                                     pointed++;
                                     Window.this.setTitle("mine:" + mine + "   pointed:" + pointed);
                                 }
-                                else if (jbtemp.getText() == "!") {
+                                else if (jbtemp.getText().equals("!")) {
                                     jbtemp.setEnabled(true);
                                     jbtemp.setText("?");
                                     rightClicked[x][y] = false;
@@ -207,21 +207,21 @@ public class Window extends JFrame {
         mistory--;          //0都会被mistory--;但是非0则不会.
         int[] i = new int[]{row,row-1,row+1};
         int[] j = new int[]{col,col-1,col+1};
-        for (int r = 0;r< i.length;r++)
-            for (int s=0;s < j.length;s++){
-                if (i[r] >=0 && j[s] >= 0 &&i[r] < Window.row && j[s] < Window.col){
-                    JButton btn1 = (JButton) c.get(i[r]*Window.col + j[s]);
-                    if (arr[i[r]][j[s]] != 0 && clicked[i[r]][j[s]] == false){
-                        btn1.setText(Integer.toString(arr[i[r]][j[s]]));
+        for (int i1 : i)
+            for (int i2 : j) {
+                if (i1 >= 0 && i2 >= 0 && i1 < Window.row && i2 < Window.col) {
+                    JButton btn1 = (JButton) c.get(i1 * Window.col + i2);
+                    if (arr[i1][i2] != 0 && clicked[i1][i2]) {
+                        btn1.setText(Integer.toString(arr[i1][i2]));
                         btn1.setEnabled(false);
                         btn1.setBackground(Color.gray);
-                        clicked[i[r]][j[s]] = true;
+                        clicked[i1][i2] = true;
                         mistory--;
                     }
                     //下面的clicked判断得是true,因为,第一次点0的时候,在上面就已经
                     //吧clicked设为true了,所以就不会执行这里面的东西了.
-                    if (arr[i[r]][j[s]] == 0 && clicked[i[r]][j[s]] == false){
-                        showAroundNumber(i[r],j[s]);
+                    if (arr[i1][i2] == 0 && !clicked[i1][i2]) {
+                        showAroundNumber(i1, i2);
                     }
                 }
 

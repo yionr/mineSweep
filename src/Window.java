@@ -1,7 +1,5 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.sql.*;
@@ -24,7 +22,7 @@ public class Window extends JFrame {
     private static int mistory;
     private static int mine;
     private static int pointed;
-    private static ArrayList c = new ArrayList();
+    private static ArrayList<JButton> c = new ArrayList<>();
     public static void main(String[] args) {
         new Window();
     }
@@ -77,35 +75,31 @@ public class Window extends JFrame {
             for (int j = 0; j < col; j++){
                 sum_mine = 0;
                 if (j - 1 >= 0) {
+                    if (arr[i][j - 1] == 9)     //左
+                        sum_mine++;
                     if (i - 1 >= 0)           //左上
                         if (arr[i - 1][j - 1] == 9)
-                            sum_mine++;
-                    if (i < row)              //左
-                        if (arr[i][j - 1] == 9)
                             sum_mine++;
                     if (i + 1 < row)              //左下
                         if (arr[i + 1][j - 1] == 9)
                             sum_mine++;
                 }
                 if (j + 1 < col) {
+                    if (arr[i][j + 1] == 9) //右
+                        sum_mine++;
                     if (i - 1 >= 0)           //右上
                         if (arr[i - 1][j + 1] == 9)
-                            sum_mine++;
-                    if (i < row)              //右
-                        if (arr[i][j + 1] == 9)
                             sum_mine++;
                     if (i + 1 < row)              //右下
                         if (arr[i + 1][j + 1] == 9)
                             sum_mine++;
                 }
-                if (j < col) {
                     if (i - 1 >= 0)           //上
                         if (arr[i - 1][j] == 9)
                             sum_mine++;
                     if (i + 1 < row)              //下
                         if (arr[i + 1][j] == 9)
                             sum_mine++;
-                }
                 if (arr[i][j] != 9)
                     arr[i][j] = sum_mine;
             }
@@ -118,28 +112,25 @@ public class Window extends JFrame {
                 JButton btn = new JButton();
                 btn.setBackground(Color.white);
                 c.add(btn);
-                btn.addActionListener(new ActionListener() {
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        int x,y;
-                        x = c.indexOf(btn)/col;
-                        y = c.indexOf(btn)%col;
-                        //arr = 9代表炸弹,炸弹就游戏结束,如果不是炸弹的话.则显示这个格子的数字.
-                        //那么首先得给每个格子确定数字
-                        if (arr[x][y] == 9){
-                            gameOver();
-                        }
-                        else if (arr[x][y] == 0)
-                            showAroundNumber(x,y);
-                        else
-                            showNumber(x,y);
-                        //通关条件
-                        if (mistory - mine ==0) {
-                            try {
-                                gamePass();
-                            } catch (SQLException e1) {
-                                e1.printStackTrace();
-                            }
+                btn.addActionListener(e -> {
+                    int x,y;
+                    x = c.indexOf(btn)/col;
+                    y = c.indexOf(btn)%col;
+                    //arr = 9代表炸弹,炸弹就游戏结束,如果不是炸弹的话.则显示这个格子的数字.
+                    //那么首先得给每个格子确定数字
+                    if (arr[x][y] == 9){
+                        gameOver();
+                    }
+                    else if (arr[x][y] == 0)
+                        showAroundNumber(x,y);
+                    else
+                        showNumber(x,y);
+                    //通关条件
+                    if (mistory - mine ==0) {
+                        try {
+                            gamePass();
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
                         }
                     }
                 });
@@ -180,7 +171,7 @@ public class Window extends JFrame {
     }
 
     private void showNumber(int row,int col) {
-        JButton btn = (JButton) c.get(row*Window.col + col);
+        JButton btn = c.get(row*Window.col + col);
         btn.setText(Integer.toString(arr[row][col]));
         if (arr[row][col] == 9)
             btn.setText("X");
@@ -194,7 +185,7 @@ public class Window extends JFrame {
         //当前这个,,这一个被点,当递归调用的时候,如果0旁边还有0,则模拟旁边的0被点的情况,所以旁边如果不是0,则那些公共
         //的点会被多次mistory,如果吧mistory放在外面,则只会计数0的个数.
         clicked[row][col] = true;
-        JButton btn = (JButton) c.get(row*Window.col + col);
+        JButton btn = c.get(row*Window.col + col);
 //        btn.setText(Integer.toString(arr[row][col]));
         btn.setText("");
         btn.setEnabled(false);
@@ -205,7 +196,7 @@ public class Window extends JFrame {
         for (int r = 0;r< i.length;r++)
             for (int s=0;s < j.length;s++){
                 if (i[r] >=0 && j[s] >= 0 &&i[r] < Window.row && j[s] < Window.col){
-                    JButton btn1 = (JButton) c.get(i[r]*Window.col + j[s]);
+                    JButton btn1 = c.get(i[r]*Window.col + j[s]);
                     if (arr[i[r]][j[s]] != 0 && !clicked[i[r]][j[s]]){
                         btn1.setText(Integer.toString(arr[i[r]][j[s]]));
                         btn1.setEnabled(false);
@@ -224,7 +215,7 @@ public class Window extends JFrame {
     }
     private void showAllMines(){
         for (int i =0;i < Window.row*Window.col;i++){
-            JButton btn = (JButton) c.get(i);
+            JButton btn = c.get(i);
             btn.setEnabled(false);
             if (arr[i/col][i%col] == 9)
                 showNumber(i/col,i%col);
@@ -300,7 +291,7 @@ public class Window extends JFrame {
         init();
         gameArea(row,col);
         for (int i =0;i < Window.row*Window.col;i++) {
-            JButton btn = (JButton) c.get(i);
+            JButton btn = c.get(i);
             btn.setEnabled(true);
             btn.setText("");
             btn.setBackground(Color.white);

@@ -3,6 +3,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 
 public class DBUtil {
+    public static final String NAME = "root";
+    public static final String PASSWORD = "1999102lp";
+    public static final String DATABASE = "mine";
+    public static final String DBIP = "localhost";
     public static Connection getConnection(String DBIP,String NAME,String PASSWORD) {
         Connection conn = null;
         try {

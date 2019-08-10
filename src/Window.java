@@ -24,11 +24,6 @@ public class Window extends JFrame {
     private static int mistory;
     private static int mine;
     private static int pointed;
-    public static final String NAME = "root";
-    public static final String PASSWORD = "1999102lp";
-    public static final String DATABASE = "mine";
-    public static final String DBIP = "localhost";
-
     private static ArrayList c = new ArrayList();
     public static void main(String[] args) {
         new Window();
@@ -241,9 +236,9 @@ public class Window extends JFrame {
         showAllMines();
         long usedTime = new Date().getTime() - time;        //所用时间
         //排名算法.:    雷的数量和 所用时间的一波计算得出来:
-        Connection ct = DBUtil.getConnection(DBIP,NAME,PASSWORD);
+        Connection ct = DBUtil.getConnection(DBUtil.DBIP,DBUtil.NAME,DBUtil.PASSWORD);
         Statement s = ct.createStatement();
-        String sql_init  ="use " + DATABASE;
+        String sql_init  ="use " + DBUtil.DATABASE;
         String sql = "insert into mine values (" + usedTime + "," + mine + "," + usedTime/mine + ")";
         //至此,已经完成了将时间和雷数导入数据库的操作了.接下来要完成显示排名的操作
         //rank越大,说明越f菜,

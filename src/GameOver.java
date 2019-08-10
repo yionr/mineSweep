@@ -84,11 +84,11 @@ public class GameOver extends JFrame{
         r.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Connection ct = DBUtil.getConnection(Window.DBIP,Window.NAME,Window.PASSWORD);
+                Connection ct = DBUtil.getConnection(DBUtil.DBIP,DBUtil.NAME,DBUtil.PASSWORD);
 				String sum = "";
 				try {
 					Statement s = ct.createStatement();
-					String sql_init = "use " + Window.DATABASE;
+					String sql_init = "use " + DBUtil.DATABASE;
 					String sql_query = "select * from mine order by rank";
 					ResultSet rs;
 					s.execute(sql_init);

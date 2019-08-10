@@ -29,7 +29,7 @@ public class Window extends JFrame {
     public static final String DATABASE = "mine";
     public static final String DBIP = "localhost";
 
-    private static ArrayList c;
+    private static ArrayList c = new ArrayList();
     public static void main(String[] args) {
         new Window();
     }
@@ -285,7 +285,6 @@ public class Window extends JFrame {
         arr = new int[row][col];
         clicked = new boolean[row][col];
         rightClicked = new boolean[row][col];
-        c = new ArrayList();
         init_intarr(arr);
         init_booarr(clicked);
         init_booarr(rightClicked);

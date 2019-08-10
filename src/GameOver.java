@@ -1,16 +1,12 @@
 
 import java.awt.BorderLayout;
-import java.awt.TextArea;
-import java.awt.TextField;
 import java.awt.event.*;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-
 import javax.swing.*;
-import javax.swing.text.html.CSS;
 
 
 

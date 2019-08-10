@@ -89,7 +89,7 @@ public class GameOver extends JFrame{
 				try {
 					Statement s = ct.createStatement();
 					String sql_init = "use " + DBUtil.DATABASE;
-					String sql_query = "select * from mine order by rank";
+					String sql_query = "select * from mine order by `rank`";
 					ResultSet rs;
 					s.execute(sql_init);
 					rs = s.executeQuery(sql_query);

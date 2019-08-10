@@ -11,7 +11,7 @@ import java.util.Date;
 
         //前提:mysql启动,存在mine数据库,存在mine(time int,mine int ,rank int)数据表
 public class Window extends JFrame {
-    private static final int px = 50;        //42以下,好像就不能正常的显示数字了
+    private static final int PX = 50;        //42以下,好像就不能正常的显示数字了
     private static int row;
     private static int col;
     private static int heigh;
@@ -152,7 +152,7 @@ public class Window extends JFrame {
                         if (e.getButton() == 3){
                             JButton jbtemp = (JButton)e.getSource();
                             if (jbtemp.isEnabled() || rightClicked[x][y])
-                                if (jbtemp.getText().equals("!") && jbtemp.getText().equals("?")){
+                                if (jbtemp.getText().equals("")){
                                     jbtemp.setText("!");
                                     jbtemp.setEnabled(false);
                                     jbtemp.setBackground(Color.yellow);
@@ -245,7 +245,7 @@ public class Window extends JFrame {
         s.execute(sql_init);
         s.execute(sql);
         ResultSet rs;
-        String sql_query = "select * from mine order by rank ;";
+        String sql_query = "select * from mine order by `rank` ;";
         rs = s.executeQuery(sql_query);
         int i  = 0;
         while(rs.next()) {
@@ -274,8 +274,8 @@ public class Window extends JFrame {
         mine = 0;
         row = 11;                                //行数
         col = 13;                                //列数
-        heigh = row * px;
-        width = col * px;
+        heigh = row * PX;
+        width = col * PX;
         mistory = row*col;
         arr = new int[row][col];
         clicked = new boolean[row][col];

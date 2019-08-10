@@ -202,21 +202,21 @@ public class Window extends JFrame {
         mistory--;          //0都会被mistory--;但是非0则不会.
         int[] i = new int[]{row,row-1,row+1};
         int[] j = new int[]{col,col-1,col+1};
-        for (int i1 : i)
-            for (int i2 : j) {
-                if (i1 >= 0 && i2 >= 0 && i1 < Window.row && i2 < Window.col) {
-                    JButton btn1 = (JButton) c.get(i1 * Window.col + i2);
-                    if (arr[i1][i2] != 0 && clicked[i1][i2]) {
-                        btn1.setText(Integer.toString(arr[i1][i2]));
+        for (int r = 0;r< i.length;r++)
+            for (int s=0;s < j.length;s++){
+                if (i[r] >=0 && j[s] >= 0 &&i[r] < Window.row && j[s] < Window.col){
+                    JButton btn1 = (JButton) c.get(i[r]*Window.col + j[s]);
+                    if (arr[i[r]][j[s]] != 0 && !clicked[i[r]][j[s]]){
+                        btn1.setText(Integer.toString(arr[i[r]][j[s]]));
                         btn1.setEnabled(false);
                         btn1.setBackground(Color.gray);
-                        clicked[i1][i2] = true;
+                        clicked[i[r]][j[s]] = true;
                         mistory--;
                     }
                     //下面的clicked判断得是true,因为,第一次点0的时候,在上面就已经
                     //吧clicked设为true了,所以就不会执行这里面的东西了.
-                    if (arr[i1][i2] == 0 && !clicked[i1][i2]) {
-                        showAroundNumber(i1, i2);
+                    if (arr[i[r]][j[s]] == 0 && !clicked[i[r]][j[s]]){
+                        showAroundNumber(i[r],j[s]);
                     }
                 }
 

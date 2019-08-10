@@ -59,12 +59,14 @@ public class GameOver extends JFrame{
 		jp.add(setRankPanel(),BorderLayout.SOUTH);
 		return jp;
 	}
+
 	private JPanel setScorePanel() {
 		JPanel jp = new JPanel();
 		jp.add(new JLabel("用时:"));
 		jp.add(new JLabel(time+" "));
 		return jp;
 	}
+
 	private JPanel setRankPanel() {
 		JPanel jp = new JPanel();
 		JLabel r = new JLabel("排名:");

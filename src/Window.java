@@ -213,6 +213,7 @@ public class Window extends JFrame {
 
             }
     }
+
     private void showAllMines(){
         for (int i =0;i < Window.row*Window.col;i++){
             JButton btn = c.get(i);
@@ -222,7 +223,6 @@ public class Window extends JFrame {
         }
     }
 
-//在通关之后调用数据库操作排名.
     private void gamePass() throws SQLException {
         showAllMines();
         long usedTime = new Date().getTime() - time;        //所用时间
@@ -250,6 +250,7 @@ public class Window extends JFrame {
         this.setEnabled(false);
 
     }
+
     private void gameOver() {
         showAllMines();
         long usedTime = new Date().getTime() - time;        //所用时间
@@ -276,11 +277,13 @@ public class Window extends JFrame {
         init_booarr(rightClicked);
         time = new Date().getTime();
     }
+
     private void init_intarr(int[][] arr){
         for (int i = 0;i < row; i++)
             for(int j =0;j < col;j++)
                 arr[i][j] = 0;
     }
+
     private void init_booarr(boolean[][] arr){
         for (int i = 0;i < row; i++)
             for(int j =0;j < col;j++)

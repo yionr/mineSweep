@@ -1,4 +1,5 @@
 import javax.swing.*;
+import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -22,7 +23,11 @@ public class Window extends JFrame {
     private static int mistory;
     private static int mine;
     private static int pointed;
+    private static final int MENUHEIGHT = 50;
     private static ArrayList<JButton> c = new ArrayList<>();
+    private static JLabel mines = new JLabel();
+    private static JLabel times = new JLabel();
+    private static Thread t1;
     public static void main(String[] args) {
         new Window();
     }
@@ -30,9 +35,9 @@ public class Window extends JFrame {
         init();
         this.setSize(width,heigh);
         this.setTitle("MineSweeping");
-        this.setLayout(new BorderLayout());
+        this.setLayout(null);
         this.setResizable(false);
-        this.add(MenuArea(),BorderLayout.NORTH);
+        this.add(MenuArea());
         this.add(gameArea(row,col));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
@@ -42,19 +47,33 @@ public class Window extends JFrame {
     private JPanel MenuArea() {
         JPanel menu = new JPanel();
         menu.setLayout(null);
+        menu.setBounds(0,0,width,MENUHEIGHT);
+        menu.setBackground(Color.white);
+        mines.setBounds((int)(width*0.04),5,100,40);
+        mines.setFont(new Font("宋体",Font.BOLD,24));
+        menu.add(mines);
+        times.setBounds((int)(width*0.96 - 100),5,100,40);
+        times.setFont(new Font("宋体",Font.BOLD,24));
+        menu.add(times);
+        JButton restart = new JButton();
+        restart.setBounds(width / 2 - 20,5,40,40);
+        restart.setBackground(Color.white);
+        restart.setBorder(null);
+        restart.setIcon(new ImageIcon("img/1.png"));
+        restart.addActionListener(e -> res());
+        menu.add(restart);
         return menu;
     }
-
-    private JPanel gameArea(int row,int col) {
-        //设定随机个arr的值为9;
+    private void generateMine(int row,int col){
         for(int i = 0; i < row; i++)
             for (int j = 0; j < col; j++)
                 if (Math.random()*100 < difficuty){
                     arr[i][j] = 9;
                     mine++;
                 }
-        this.setTitle("All mines: " + mine);
-
+        mines.setText("mine:" + mine+"");
+    }
+    private JPanel gameArea(int row,int col) {
         //在这里确定每个格子的数值
         //给每个格子赋值.这个值怎么来呢.得先确定这个格子相邻的所有格子.
         /*
@@ -105,6 +124,7 @@ public class Window extends JFrame {
             }
         JPanel jp = new JPanel();
         jp.setLayout(new GridLayout(row,col,0,0));
+        jp.setBounds(0,MENUHEIGHT,col*PX,row*PX);
         //这个for用来创建格子.并且随机埋炸弹
         for(int i = 0; i < row; i++)
             for (int j = 0; j < col; j++){
@@ -149,7 +169,7 @@ public class Window extends JFrame {
                                     jbtemp.setBackground(Color.yellow);
                                     rightClicked[x][y] = true;
                                     pointed++;
-                                    Window.this.setTitle("mine:" + mine + "   pointed:" + pointed);
+                                    mines.setText("mine:" + --mine +"");
                                 }
                                 else if (jbtemp.getText().equals("!")) {
                                     jbtemp.setEnabled(true);
@@ -157,7 +177,7 @@ public class Window extends JFrame {
                                     rightClicked[x][y] = false;
                                     jbtemp.setBackground(Color.white);
                                     pointed--;
-                                    Window.this.setTitle("mine:" + mine + "   pointed:" + pointed);
+                                    mines.setText("mine:" + ++mine +"");
                                 }
                                 else
                                     jbtemp.setText("");
@@ -248,7 +268,7 @@ public class Window extends JFrame {
         JFrame go = new GameOver(((int)usedTime/1000)/60 + "分" + ((int)usedTime/1000)%60 + "秒",i -1,this,"You Win!");
         go.setAlwaysOnTop(true);
         this.setEnabled(false);
-
+        t1.stop();
     }
 
     private void gameOver() {
@@ -257,17 +277,17 @@ public class Window extends JFrame {
         JFrame go = new GameOver(((int)usedTime/1000)/60 + "分" + ((int)usedTime/1000)%60 + "秒",-1,this,"Game Over!");
         go.setAlwaysOnTop(true);
         this.setEnabled(false);
-
+        t1.stop();
     }
 
     private void init(){
         difficuty = 7;                          //困难系数10-50(推荐)
         pointed = 0;                            //标记点数
         mine = 0;
-        row = 11;                                //行数
-        col = 13;                                //列数
-        heigh = row * PX;
-        width = col * PX;
+        row = 10;                                //行数
+        col = 10;                                //列数
+        heigh = row * PX + MENUHEIGHT+ 37;     //37he 13 凑出来的
+        width = col * PX + 13;
         mistory = row*col;
         arr = new int[row][col];
         clicked = new boolean[row][col];
@@ -276,6 +296,23 @@ public class Window extends JFrame {
         init_booarr(clicked);
         init_booarr(rightClicked);
         time = new Date().getTime();
+        generateMine(row,col);
+        t1 = new Thread(){
+            int t = -1;
+            @Override
+            public void run() {
+                while (true){
+                    times.setText("time:" + ++t + "");
+                    System.out.println(t);
+                    try {
+                        sleep(1000);
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+        };
+        t1.start();
     }
 
     private void init_intarr(int[][] arr){

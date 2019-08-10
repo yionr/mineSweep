@@ -37,7 +37,7 @@ public class GameOver extends JFrame{
 		jbtAgain.addActionListener(e -> {
 			try {
 				GameOver.super.setVisible(false);
-				Window.class.getDeclaredMethod("res").invoke(window);
+				Window.class.getMethod("res").invoke(window);
 			} catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e1) {
 				e1.printStackTrace();
 			}

@@ -10,7 +10,7 @@ import java.util.Date;
 
         //前提:mysql启动,存在mine数据库,存在mine(time int,mine int ,rank int)数据表
 public class Window extends JFrame {
-    private static final int PX = 50;        //42以下,好像就不能正常的显示数字了
+    private static final int PX = 50;        //要想改变px就得先将按钮的数字换成图片
     private static int row;
     private static int col;
     private static int heigh;

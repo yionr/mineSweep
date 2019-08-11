@@ -10,7 +10,7 @@ import java.util.Date;
 
         //前提:mysql启动,存在mine数据库,存在mine(time int,mine int ,rank int)数据表
 public class Window extends JFrame {
-    private static final int PX = 50;        //要想改变px就得先将按钮的数字换成图片
+    private static final int PX = 40;        //要想改变px就得先将按钮的数字换成图片
     private static int row;
     private static int col;
     private static int heigh;
@@ -29,38 +29,63 @@ public class Window extends JFrame {
     private static JLabel times = new JLabel();
     private static Thread t1;
     private static boolean started;
+    private static boolean choosed = false;
+    private static String mode = "简单";
+    private static JPanel gameJp = new JPanel();
+    private static GridLayout g = new GridLayout(9,9,0,0);
+    private static JPanel menu = new JPanel();
+    private static JMenuBar jb = new JMenuBar();
+    private static JButton restart = new JButton();
+    private static JMenu option = new JMenu("选项");
     public static void main(String[] args) {
         new Window();
     }
     private Window(){
-        init();
-        this.setSize(width,heigh);
-        this.setTitle("MineSweeping");
         this.setLayout(null);
         this.setResizable(false);
-        this.add(MenuArea());
+        this.add(menuBar());
+        this.add(messageArea());
+        init();
         this.add(gameArea(row,col));
         this.setDefaultCloseOperation(EXIT_ON_CLOSE);
         this.setLocationRelativeTo(null);
         this.setVisible(true);
     }
-
-    private JPanel MenuArea() {
-        JPanel menu = new JPanel();
+    private JMenuBar menuBar(){
+        jb.setBackground(Color.white);
+        jb.setBounds(0,0,width,30);
+        JMenu restart = new JMenu("新游戏");
+        JMenu level = new JMenu("难度");
+        JMenu quit = new JMenu("退出");
+        JMenuItem easy = new JMenuItem("容易(9X9)");
+        easy.addActionListener(e ->{row = col = 9; choosed = true; mode = "简单"; init();});
+        JMenuItem middle = new JMenuItem("中等(13X13)");
+        middle.addActionListener(e ->{row = col = 13; choosed = true; mode = "中等"; init();});
+        JMenuItem hard = new JMenuItem("困难(13X30)");
+        hard.addActionListener(e ->{row = 13; col = 30; choosed = true; mode = "困难"; init();});
+        JMenuItem customized = new JMenuItem("自定义");
+        level.add(easy);
+        level.add(middle);
+        level.add(hard);
+        level.add(customized);
+        option.add(level);
+        jb.add(option);
+        return  jb;
+    }
+    private JPanel messageArea() {
         menu.setLayout(null);
-        menu.setBounds(0,0,width,MENUHEIGHT);
+        menu.setBounds(0,30,width,MENUHEIGHT);
         menu.setBackground(Color.white);
-        mines.setBounds((int)(width*0.04),5,100,40);
-        mines.setFont(new Font("宋体",Font.BOLD,24));
+        mines.setBounds((int)(width*0.04),5,170,40);
+        mines.setFont(new Font("宋体",Font.BOLD,12));
         menu.add(mines);
         times.setBounds((int)(width*0.96 - 100),5,100,40);
-        times.setFont(new Font("宋体",Font.BOLD,24));
+        times.setFont(new Font("宋体",Font.BOLD,12));
         menu.add(times);
-        JButton restart = new JButton();
         restart.setBounds(width / 2 - 20,5,40,40);
         restart.setBackground(Color.white);
         restart.setBorder(null);
-        restart.setIcon(new ImageIcon("img/1.png"));
+        restart.setIcon(new ImageIcon("img/smile.png"));
         restart.addActionListener(e -> res());
         menu.add(restart);
         return menu;
@@ -87,33 +112,17 @@ public class Window extends JFrame {
                         mine--;
                     }
                 }}
-        mines.setText("mine:" + mine+"");
+        mines.setText("剩余雷数量:" + mine);
     }
-    private JPanel gameArea(int row,int col) {
-        //在这里确定每个格子的数值
-        //给每个格子赋值.这个值怎么来呢.得先确定这个格子相邻的所有格子.
-        /*
-         * 假设一个5*5的布局
-         *  1  2  3  4  5
-         *  6  7  8  9  10
-         *  11 12 13 14 15
-         *  16 17 18 19 20
-         *  21 22 23 24 25
-         *  一个格子的+1和-1如果有的话,肯定是相邻的
-         *  一个格子如果有+row和-row的话,肯定也是相邻的
-         *  一个格子如果有+row+1和+row-1和-row+1和-row-1的话,也属于,就这么多.
-         *  一个格子用8个if来确定所有的9
-         * */
 
-        JPanel jp = new JPanel();
-        jp.setLayout(new GridLayout(row,col,0,0));
-        jp.setBounds(0,MENUHEIGHT,col*PX,row*PX);
-        //这个for用来创建格子.并且随机埋炸弹
+    private void generateButton(int row,int col){
+        if (c.size() == 0)
         for(int i = 0; i < row; i++)
             for (int j = 0; j < col; j++){
 //                JButton btn = new JButton(Integer.toString(arr[i][j]));
                 JButton btn = new JButton();
                 btn.setBackground(Color.white);
+                btn.setFont(new Font("黑体",Font.PLAIN,12));
                 c.add(btn);
                 btn.addActionListener(e -> {
                     int x,y;
@@ -124,6 +133,7 @@ public class Window extends JFrame {
                     if (!started){
                         started = true;
                         arr[x][y] =0;
+                        option.setEnabled(false);
                         startTime();                //开始计时
                         generateMine(row,col,x,y);  //埋雷,自动排除x,y坐标的雷
                         checkEveryBuuton();         //初始化每个格子
@@ -159,7 +169,7 @@ public class Window extends JFrame {
                                     jbtemp.setBackground(Color.yellow);
                                     rightClicked[x][y] = true;
                                     pointed++;
-                                    mines.setText("mine:" + --mine +"");
+                                    mines.setText("剩余雷数量:" + --mine);
                                 }
                                 else if (jbtemp.getText().equals("!")) {
                                     jbtemp.setEnabled(true);
@@ -167,16 +177,21 @@ public class Window extends JFrame {
                                     rightClicked[x][y] = false;
                                     jbtemp.setBackground(Color.white);
                                     pointed--;
-                                    mines.setText("mine:" + ++mine +"");
+                                    mines.setText("剩余雷数量:" + ++mine);
                                 }
                                 else
                                     jbtemp.setText("");
                         }
                     }
                 });
-                jp.add(btn);
+                gameJp.add(btn);
             }
-        return jp;
+    }
+    private JPanel gameArea(int row,int col) {
+        gameJp.setLayout(g);
+        gameJp.setBounds(0,MENUHEIGHT + 30,col*PX,row*PX);
+        //总结:游戏面板变大,按钮会随之变大
+        return gameJp;
     }
 
     private void showNumber(int row,int col) {
@@ -190,6 +205,20 @@ public class Window extends JFrame {
         mistory--;
     }
     private void checkEveryBuuton(){
+        //在这里确定每个格子的数值
+        //给每个格子赋值.这个值怎么来呢.得先确定这个格子相邻的所有格子.
+        /*
+         * 假设一个5*5的布局
+         *  1  2  3  4  5
+         *  6  7  8  9  10
+         *  11 12 13 14 15
+         *  16 17 18 19 20
+         *  21 22 23 24 25
+         *  一个格子的+1和-1如果有的话,肯定是相邻的
+         *  一个格子如果有+row和-row的话,肯定也是相邻的
+         *  一个格子如果有+row+1和+row-1和-row+1和-row-1的话,也属于,就这么多.
+         *  一个格子用8个if来确定所有的9
+         * */
         int sum_mine;
         for(int i = 0; i < row; i++)
             for (int j = 0; j < col; j++){
@@ -304,12 +333,15 @@ public class Window extends JFrame {
     }
 
     private void init(){
-        difficuty = 17;                          //困难系数10-50(推荐)
+        c.clear();
+        difficuty = 20;                          //困难系数10-50(推荐)
         pointed = 0;                            //标记点数
         mine = 0;
-        row = 10;                                //行数
-        col = 10;                                //列数
-        heigh = row * PX + MENUHEIGHT+ 37;     //37he 13 凑出来的
+        if (!choosed){
+            row = 9;                                //行数
+            col = 9;                                //列数
+        }
+        heigh = row * PX + MENUHEIGHT + jb.getHeight() + 37;
         width = col * PX + 13;
         mistory = row*col;
         arr = new int[row][col];
@@ -319,8 +351,28 @@ public class Window extends JFrame {
         init_booarr(clicked);
         init_booarr(rightClicked);
         started = false;
-        mines.setText("mine:?");
-        times.setText("time:0");
+        mines.setText("剩余雷数量:?");
+        times.setText("时间:0");
+        this.setSize(width,heigh);
+        this.setTitle("扫雷: " + mode);
+        g.setRows(row);
+        g.setColumns(col);
+        gameJp.removeAll();
+        jb.setBounds(0,0,width,30);
+        menu.setBounds(0,30,width,MENUHEIGHT);
+        mines.setBounds((int)(width*0.04),5,170,40);
+        times.setBounds((int)(width*0.96 - 100),5,100,40);
+        restart.setBounds(width / 2 - 20,5,40,40);
+        generateButton(row,col);
+        for (int i =0;i < Window.row*Window.col;i++) {
+            JButton btn = c.get(i);
+            btn.setEnabled(true);
+            btn.setText("");
+            btn.setBackground(Color.white);
+        }
+        gameArea(row,col);
+        gameJp.updateUI();
+        this.setLocationRelativeTo(null);
     }
     //需求:在点开第一个格子之后, -> 埋雷 -> 初始化每个格子的数值  -> 开始计时
             //started用于标记是否游戏开始,任何时候,在点开第一个格子之前,started都因该是false
@@ -332,7 +384,7 @@ public class Window extends JFrame {
             @Override
             public void run() {
                 while (true){
-                    times.setText("time:" + ++t + "");
+                    times.setText("时间:" + ++t);
                     try {
                         sleep(1000);
                     } catch (InterruptedException e) {
@@ -359,13 +411,8 @@ public class Window extends JFrame {
     public void res(){
         if (t1 != null)
             t1.stop();
+        option.setEnabled(true);
         init();
-        gameArea(row,col);
-        for (int i =0;i < Window.row*Window.col;i++) {
-            JButton btn = c.get(i);
-            btn.setEnabled(true);
-            btn.setText("");
-            btn.setBackground(Color.white);
-        }
+
     }
 }

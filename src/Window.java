@@ -28,6 +28,7 @@ public class Window extends JFrame {
     private static JLabel mines = new JLabel();
     private static JLabel times = new JLabel();
     private static Thread t1;
+    private static boolean started;
     public static void main(String[] args) {
         new Window();
     }
@@ -64,13 +65,28 @@ public class Window extends JFrame {
         menu.add(restart);
         return menu;
     }
-    private void generateMine(int row,int col){
+    private void generateMine(int row,int col,int x,int y){
         for(int i = 0; i < row; i++)
             for (int j = 0; j < col; j++)
                 if (Math.random()*100 < difficuty){
                     arr[i][j] = 9;
                     mine++;
                 }
+        //先保证第一个点开的不是雷,然后周围8个都不能是雷
+        if (arr[x][y] == 9){
+            arr[x][y] = 0;
+            mine--;
+        }
+        int[] i = new int[]{x,x-1,x+1};
+        int[] j = new int[]{y,y-1,y+1};
+        for (int r = 0;r< i.length;r++)
+            for (int s=0;s < j.length;s++){
+                if (i[r] >=0 && j[s] >= 0 &&i[r] < Window.row && j[s] < Window.col){
+                    if (arr[i[r]][j[s]] == 9){
+                        arr[i[r]][j[s]] = 0;
+                        mine--;
+                    }
+                }}
         mines.setText("mine:" + mine+"");
     }
     private JPanel gameArea(int row,int col) {
@@ -88,7 +104,92 @@ public class Window extends JFrame {
          *  一个格子如果有+row+1和+row-1和-row+1和-row-1的话,也属于,就这么多.
          *  一个格子用8个if来确定所有的9
          * */
-        //这里行列变量还需要优化,如果行列不一致可能报错
+
+        JPanel jp = new JPanel();
+        jp.setLayout(new GridLayout(row,col,0,0));
+        jp.setBounds(0,MENUHEIGHT,col*PX,row*PX);
+        //这个for用来创建格子.并且随机埋炸弹
+        for(int i = 0; i < row; i++)
+            for (int j = 0; j < col; j++){
+//                JButton btn = new JButton(Integer.toString(arr[i][j]));
+                JButton btn = new JButton();
+                btn.setBackground(Color.white);
+                c.add(btn);
+                btn.addActionListener(e -> {
+                    int x,y;
+                    x = c.indexOf(btn)/col;
+                    y = c.indexOf(btn)%col;
+                    //arr = 9代表炸弹,炸弹就游戏结束,如果不是炸弹的话.则显示这个格子的数字.
+                    //那么首先得给每个格子确定数字
+                    if (!started){
+                        started = true;
+                        arr[x][y] =0;
+                        startTime();                //开始计时
+                        generateMine(row,col,x,y);  //埋雷,自动排除x,y坐标的雷
+                        checkEveryBuuton();         //初始化每个格子
+                    }
+                    if (arr[x][y] == 9){
+                        gameOver();
+                    }
+                    else if (arr[x][y] == 0)
+                        showAroundNumber(x,y);
+                    else
+                        showNumber(x,y);
+                    //通关条件
+                    if (mistory - mine ==0) {
+                        try {
+                            gamePass();
+                        } catch (SQLException e1) {
+                            e1.printStackTrace();
+                        }
+                    }
+                });
+                btn.addMouseListener(new MouseAdapter() {
+                    @Override
+                    public void mouseClicked(MouseEvent e) {
+                        int x,y;
+                        x = c.indexOf(btn)/col;
+                        y = c.indexOf(btn)%col;
+                        if (e.getButton() == 3 && started){
+                            JButton jbtemp = (JButton)e.getSource();
+                            if (jbtemp.isEnabled() || rightClicked[x][y])
+                                if (jbtemp.getText().equals("")){
+                                    jbtemp.setText("!");
+                                    jbtemp.setEnabled(false);
+                                    jbtemp.setBackground(Color.yellow);
+                                    rightClicked[x][y] = true;
+                                    pointed++;
+                                    mines.setText("mine:" + --mine +"");
+                                }
+                                else if (jbtemp.getText().equals("!")) {
+                                    jbtemp.setEnabled(true);
+                                    jbtemp.setText("?");
+                                    rightClicked[x][y] = false;
+                                    jbtemp.setBackground(Color.white);
+                                    pointed--;
+                                    mines.setText("mine:" + ++mine +"");
+                                }
+                                else
+                                    jbtemp.setText("");
+                        }
+                    }
+                });
+                jp.add(btn);
+            }
+        return jp;
+    }
+
+    private void showNumber(int row,int col) {
+        JButton btn = c.get(row*Window.col + col);
+        btn.setText(Integer.toString(arr[row][col]));
+        if (arr[row][col] == 9)
+            btn.setText("X");
+        clicked[row][col] = true;
+        btn.setEnabled(false);
+        btn.setBackground(Color.gray);
+        mistory--;
+    }
+    private void checkEveryBuuton(){
         int sum_mine;
         for(int i = 0; i < row; i++)
             for (int j = 0; j < col; j++){
@@ -113,100 +214,22 @@ public class Window extends JFrame {
                         if (arr[i + 1][j + 1] == 9)
                             sum_mine++;
                 }
-                    if (i - 1 >= 0)           //上
-                        if (arr[i - 1][j] == 9)
-                            sum_mine++;
-                    if (i + 1 < row)              //下
-                        if (arr[i + 1][j] == 9)
-                            sum_mine++;
+                if (i - 1 >= 0)           //上
+                    if (arr[i - 1][j] == 9)
+                        sum_mine++;
+                if (i + 1 < row)              //下
+                    if (arr[i + 1][j] == 9)
+                        sum_mine++;
                 if (arr[i][j] != 9)
                     arr[i][j] = sum_mine;
             }
-        JPanel jp = new JPanel();
-        jp.setLayout(new GridLayout(row,col,0,0));
-        jp.setBounds(0,MENUHEIGHT,col*PX,row*PX);
-        //这个for用来创建格子.并且随机埋炸弹
-        for(int i = 0; i < row; i++)
-            for (int j = 0; j < col; j++){
-//                JButton btn = new JButton(Integer.toString(arr[i][j]));
-                JButton btn = new JButton();
-                btn.setBackground(Color.white);
-                c.add(btn);
-                btn.addActionListener(e -> {
-                    int x,y;
-                    x = c.indexOf(btn)/col;
-                    y = c.indexOf(btn)%col;
-                    //arr = 9代表炸弹,炸弹就游戏结束,如果不是炸弹的话.则显示这个格子的数字.
-                    //那么首先得给每个格子确定数字
-                    if (arr[x][y] == 9){
-                        gameOver();
-                    }
-                    else if (arr[x][y] == 0)
-                        showAroundNumber(x,y);
-                    else
-                        showNumber(x,y);
-                    //通关条件
-                    if (mistory - mine ==0) {
-                        try {
-                            gamePass();
-                        } catch (SQLException e1) {
-                            e1.printStackTrace();
-                        }
-                    }
-                });
-                btn.addMouseListener(new MouseAdapter() {
-                    @Override
-                    public void mouseClicked(MouseEvent e) {
-                        int x,y;
-                        x = c.indexOf(btn)/col;
-                        y = c.indexOf(btn)%col;
-                        if (e.getButton() == 3){
-                            JButton jbtemp = (JButton)e.getSource();
-                            if (jbtemp.isEnabled() || rightClicked[x][y])
-                                if (jbtemp.getText().equals("")){
-                                    jbtemp.setText("!");
-                                    jbtemp.setEnabled(false);
-                                    jbtemp.setBackground(Color.yellow);
-                                    rightClicked[x][y] = true;
-                                    pointed++;
-                                    mines.setText("mine:" + --mine +"");
-                                }
-                                else if (jbtemp.getText().equals("!")) {
-                                    jbtemp.setEnabled(true);
-                                    jbtemp.setText("?");
-                                    rightClicked[x][y] = false;
-                                    jbtemp.setBackground(Color.white);
-                                    pointed--;
-                                    mines.setText("mine:" + ++mine +"");
-                                }
-                                else
-                                    jbtemp.setText("");
-                        }
-                    }
-
-                });
-                jp.add(btn);
-            }
-        return jp;
     }
-
-    private void showNumber(int row,int col) {
-        JButton btn = c.get(row*Window.col + col);
-        btn.setText(Integer.toString(arr[row][col]));
-        if (arr[row][col] == 9)
-            btn.setText("X");
-        clicked[row][col] = true;
-        btn.setEnabled(false);
-        btn.setBackground(Color.gray);
-        mistory--;
-    }
-
     private void showAroundNumber(int row, int col) {
         //当前这个,,这一个被点,当递归调用的时候,如果0旁边还有0,则模拟旁边的0被点的情况,所以旁边如果不是0,则那些公共
         //的点会被多次mistory,如果吧mistory放在外面,则只会计数0的个数.
         clicked[row][col] = true;
         JButton btn = c.get(row*Window.col + col);
-//        btn.setText(Integer.toString(arr[row][col]));
+        btn.setText(Integer.toString(arr[row][col]));
         btn.setText("");
         btn.setEnabled(false);
         btn.setBackground(Color.gray);
@@ -281,7 +304,7 @@ public class Window extends JFrame {
     }
 
     private void init(){
-        difficuty = 7;                          //困难系数10-50(推荐)
+        difficuty = 17;                          //困难系数10-50(推荐)
         pointed = 0;                            //标记点数
         mine = 0;
         row = 10;                                //行数
@@ -295,15 +318,21 @@ public class Window extends JFrame {
         init_intarr(arr);
         init_booarr(clicked);
         init_booarr(rightClicked);
+        started = false;
+        mines.setText("mine:?");
+        times.setText("time:0");
+    }
+    //需求:在点开第一个格子之后, -> 埋雷 -> 初始化每个格子的数值  -> 开始计时
+            //started用于标记是否游戏开始,任何时候,在点开第一个格子之前,started都因该是false
+
+    private void startTime(){
         time = new Date().getTime();
-        generateMine(row,col);
         t1 = new Thread(){
             int t = -1;
             @Override
             public void run() {
                 while (true){
                     times.setText("time:" + ++t + "");
-                    System.out.println(t);
                     try {
                         sleep(1000);
                     } catch (InterruptedException e) {
@@ -328,6 +357,8 @@ public class Window extends JFrame {
     }
 
     public void res(){
+        if (t1 != null)
+            t1.stop();
         init();
         gameArea(row,col);
         for (int i =0;i < Window.row*Window.col;i++) {

@@ -4,7 +4,7 @@ import java.sql.SQLException;
 
 public class DBUtil {
     private static final String NAME = "root";
-    private static final String PASSWORD = "1999102lp";
+    private static final String PASSWORD = "";
     public static final String DATABASE = "mine";
     private static final String DBIP = "localhost";
     public static Connection getConnection() {

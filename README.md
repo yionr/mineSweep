@@ -1,1 +1,2 @@
-# MineSweeping made by java
+# 乞丐版扫雷
+使用JAVA制作

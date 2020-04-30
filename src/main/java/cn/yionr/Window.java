@@ -30,6 +30,7 @@ public class Window extends JFrame {
     private static JLabel mines = new JLabel();
     private static JLabel times = new JLabel();
     private static Thread t1;
+    private DBUtil dbutil = new DBUtil();
     public static void main(String[] args) {
         new Window();
     }
@@ -148,6 +149,7 @@ public class Window extends JFrame {
                     else
                         showNumber(x,y);
                     //通关条件
+                    System.out.println(mistory + "," + mine);
                     if (mistory - mine ==0) {
                         try {
                             gamePass();
@@ -249,13 +251,11 @@ public class Window extends JFrame {
         showAllMines();
         long usedTime = new Date().getTime() - time;        //所用时间
         //排名算法.:    雷的数量和 所用时间的一波计算得出来:
-        Connection ct = DBUtil.getConnection();
+        Connection ct = dbutil.getConnection();
         Statement s = ct.createStatement();
-        String sql_init  ="use " + DBUtil.DATABASE;
         String sql = "insert into mine values (" + usedTime + "," + mine + "," + usedTime/mine + ")";
         //至此,已经完成了将时间和雷数导入数据库的操作了.接下来要完成显示排名的操作
         //rank越大,说明越f菜,
-        s.execute(sql_init);
         s.execute(sql);
         ResultSet rs;
         String sql_query = "select * from mine order by `rank` ;";
@@ -299,13 +299,14 @@ public class Window extends JFrame {
         init_booarr(rightClicked);
         time = new Date().getTime();
         generateMine(row,col);
+        if (t1 != null)
+            t1.stop();
         t1 = new Thread(){
             int t = -1;
             @Override
             public void run() {
                 while (true){
                     times.setText("time:" + ++t + "");
-                    System.out.println(t);
                     try {
                         sleep(1000);
                     } catch (InterruptedException e) {

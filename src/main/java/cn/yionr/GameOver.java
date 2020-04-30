@@ -17,6 +17,7 @@ public class GameOver extends JFrame{
 	private static String str;
 	private JButton jbtAgain = new JButton("Again");
 	private JButton jbtCanel = new JButton("Cancel");
+	private DBUtil dbutil = new DBUtil();
 
 	public GameOver( String time,int rank,JFrame window,String str){
 		GameOver.str = str;
@@ -76,14 +77,12 @@ public class GameOver extends JFrame{
         r.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Connection ct = DBUtil.getConnection();
+                Connection ct = dbutil.getConnection();
 				String sum = "";
 				try {
 					Statement s = ct.createStatement();
-					String sql_init = "use " + DBUtil.DATABASE;
 					String sql_query = "select * from mine order by `rank`";
 					ResultSet rs;
-					s.execute(sql_init);
 					rs = s.executeQuery(sql_query);
 					int i = 0;
 					while(rs.next() && ++i < 31){

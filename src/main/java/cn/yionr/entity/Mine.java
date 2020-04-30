@@ -1,5 +1,5 @@
 package cn.yionr.entity;
 
-public class mine {
+public class Mine {
 
 }

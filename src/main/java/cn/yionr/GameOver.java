@@ -81,7 +81,7 @@ public class GameOver extends JFrame{
 				String sum = "";
 				try {
 					Statement s = ct.createStatement();
-					String sql_query = "select * from mine order by `rank`";
+					String sql_query = "select * from ranking order by `rank`";
 					ResultSet rs;
 					rs = s.executeQuery(sql_query);
 					int i = 0;

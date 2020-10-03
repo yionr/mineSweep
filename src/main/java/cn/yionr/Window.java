@@ -1,7 +1,8 @@
 package cn.yionr;
 
+import cn.yionr.entity.Ranking;
+
 import javax.swing.*;
-import javax.swing.border.Border;
 import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -9,8 +10,6 @@ import java.sql.*;
 import java.util.ArrayList;
 import java.util.Date;
 
-
-        //前提:mysql启动,存在mine数据库,存在mine(time int,mine int ,rank int)数据表
 public class Window extends JFrame {
     private static final int PX = 50;        //42以下,好像就不能正常的显示数字了
     private static int row;
@@ -31,6 +30,7 @@ public class Window extends JFrame {
     private static JLabel times = new JLabel();
     private static Thread t1;
     private DBUtil dbutil = new DBUtil();
+    Ranking ranking = null;
     public static void main(String[] args) {
         new Window();
     }
@@ -74,6 +74,8 @@ public class Window extends JFrame {
                     arr[i][j] = 9;
                     mine++;
                 }
+        ranking = new Ranking();
+        ranking.setMine(mine);
         mines.setText("mine:" + mine+"");
     }
     private JPanel gameArea(int row,int col) {
@@ -172,7 +174,7 @@ public class Window extends JFrame {
                                     jbtemp.setEnabled(false);
                                     jbtemp.setBackground(Color.yellow);
                                     rightClicked[x][y] = true;
-                                    pointed++;
+                                    mistory--;
                                     mines.setText("mine:" + --mine +"");
                                 }
                                 else if (jbtemp.getText().equals("!")) {
@@ -180,7 +182,7 @@ public class Window extends JFrame {
                                     jbtemp.setText("?");
                                     rightClicked[x][y] = false;
                                     jbtemp.setBackground(Color.white);
-                                    pointed--;
+                                    mistory++;
                                     mines.setText("mine:" + ++mine +"");
                                 }
                                 else
@@ -250,24 +252,28 @@ public class Window extends JFrame {
     private void gamePass() throws SQLException {
         showAllMines();
         long usedTime = new Date().getTime() - time;        //所用时间
-        //排名算法.:    雷的数量和 所用时间的一波计算得出来:
+        //排名方式:    雷的数量和 所用时间的一波计算得出来:
+
+        ranking.setTime(usedTime);
+        ranking.setRank(usedTime/mine);
+
         Connection ct = dbutil.getConnection();
         Statement s = ct.createStatement();
-        String sql = "insert into mine values (" + usedTime + "," + mine + "," + usedTime/mine + ")";
+        String sql = "insert into ranking values (" + ranking.getTime() + "," + ranking.getMine() + "," + ranking.getRank() + ")";
         //至此,已经完成了将时间和雷数导入数据库的操作了.接下来要完成显示排名的操作
         //rank越大,说明越f菜,
         s.execute(sql);
         ResultSet rs;
-        String sql_query = "select * from mine order by `rank` ;";
+        String sql_query = "select * from ranking order by `rank` ;";
         rs = s.executeQuery(sql_query);
         int i  = 0;
         while(rs.next()) {
             i++;
-            if (rs.getInt("rank") > usedTime/mine)
+            if (rs.getInt("rank") > ranking.getRank())
                 break;
         }
 
-        JFrame go = new GameOver(((int)usedTime/1000)/60 + "分" + ((int)usedTime/1000)%60 + "秒",i -1,this,"You Win!");
+        JFrame go = new GameOver(((int)ranking.getTime()/1000)/60 + "分" + ((int)ranking.getTime()/1000)%60 + "秒",i -1,this,"You Win!");
         go.setAlwaysOnTop(true);
         this.setEnabled(false);
         t1.stop();

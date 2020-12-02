@@ -31,6 +31,10 @@ public class Window extends JFrame {
     private static Thread t1;
     private DBUtil dbutil = new DBUtil();
     Ranking ranking = null;
+    private Connection ct;
+    {
+        ct = dbutil.getConnection();
+    }
     public static void main(String[] args) {
         new Window();
     }
@@ -255,9 +259,9 @@ public class Window extends JFrame {
         //排名方式:    雷的数量和 所用时间的一波计算得出来:
 
         ranking.setTime(usedTime);
-        ranking.setRank(usedTime/mine);
+        ranking.setRank(usedTime/ranking.getMine());
 
-        Connection ct = dbutil.getConnection();
+
         Statement s = ct.createStatement();
         String sql = "insert into ranking values (" + ranking.getTime() + "," + ranking.getMine() + "," + ranking.getRank() + ")";
         //至此,已经完成了将时间和雷数导入数据库的操作了.接下来要完成显示排名的操作

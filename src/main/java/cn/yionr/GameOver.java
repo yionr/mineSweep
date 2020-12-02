@@ -18,7 +18,10 @@ public class GameOver extends JFrame{
 	private JButton jbtAgain = new JButton("Again");
 	private JButton jbtCanel = new JButton("Cancel");
 	private DBUtil dbutil = new DBUtil();
-
+	private Connection ct;
+	{
+		ct = dbutil.getConnection();
+	}
 	public GameOver( String time,int rank,JFrame window,String str){
 		GameOver.str = str;
 		GameOver.time =time;
@@ -77,7 +80,7 @@ public class GameOver extends JFrame{
         r.addMouseListener(new MouseAdapter() {
             @Override
             public void mouseClicked(MouseEvent e) {
-                Connection ct = dbutil.getConnection();
+
 				String sum = "";
 				try {
 					Statement s = ct.createStatement();
